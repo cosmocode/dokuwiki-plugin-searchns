@@ -31,7 +31,12 @@ class helper_plugin_searchns extends Plugin
             }
             $ns[trim($n[1])] = rtrim(trim($n[0], ':'));
         }
-        $ns['all'] = '';
+
+        if ($this->getConf('first all')) {
+            $ns = array_merge(['all' => ''], $ns);
+        } else {
+            $ns['all'] = '';
+        }
 
         return $ns;
     }

@@ -6,3 +6,4 @@
  */
 
 $conf['namespaces'] = '';
+$conf['first all'] = 0;

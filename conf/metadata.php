@@ -6,3 +6,4 @@
  */
 
 $meta['namespaces'] = [''];
+$meta['first all'] = ['onoff'];
