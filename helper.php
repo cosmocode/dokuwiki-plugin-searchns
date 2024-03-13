@@ -11,12 +11,29 @@ use dokuwiki\Extension\Plugin;
 class helper_plugin_searchns extends Plugin
 {
     /**
+     * @var array
+     */
+    protected $ns;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->ns = $this->getNsFromConfig();
+    }
+
+    /**
      * Converts config string to array
      *
      * @return array
      */
     public function getNsFromConfig()
     {
+        if (!is_null($this->ns)) {
+            return $this->ns;
+        }
+
         $ns = [];
         $config = $this->getConf('namespaces');
 
@@ -33,9 +50,9 @@ class helper_plugin_searchns extends Plugin
         }
 
         if ($this->getConf('first all')) {
-            $ns = array_merge(['all' => ''], $ns);
+            $ns = array_merge([$this->getLang('all label') => ''], $ns);
         } else {
-            $ns['all'] = '';
+            $ns[$this->getLang('all label')] = '';
         }
 
         return $ns;
@@ -91,5 +108,39 @@ class helper_plugin_searchns extends Plugin
 
         $ret .= '</ul>';
         return $ret;
+    }
+
+    /**
+     * Group results based on configured namespaces.
+     * Insert headings as pseudo results.
+     *
+     * @param $results
+     * @return array
+     */
+    public function sortAndGroup($results)
+    {
+        $res = [];
+
+        $namespaces = $this->getNsFromConfig();
+        foreach ($namespaces as $label => $ns) {
+            $res[$ns] = array_filter($results, function ($page) use ($ns) {
+                return strpos($page, $ns . ':') === 0;
+            }, ARRAY_FILTER_USE_KEY);
+            // prepend namespace label
+            if (!empty($res[$ns])) {
+                $res[$ns] = array_merge([$label => ''], $res[$ns]);
+            }
+            $res = array_merge($res, $res[$ns]);
+            unset($res[$ns]);
+        }
+
+        // add the remainder as "other"
+        $rest = array_diff_key($results, $res);
+        if (!empty($rest)) {
+            $res[$this->getLang('other label')] = '';
+            $res = array_merge($res, $rest);
+        }
+
+        return $res;
     }
 }

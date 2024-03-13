@@ -19,6 +19,8 @@ class action_plugin_searchns extends ActionPlugin
         $controller->register_hook('FORM_QUICKSEARCH_OUTPUT', 'BEFORE', $this, 'handleForm');
         $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'handleStart');
         $controller->register_hook('AJAX_CALL_UNKNOWN', 'BEFORE', $this, 'handleAjax');
+        $controller->register_hook('SEARCH_QUERY_PAGELOOKUP', 'AFTER', $this, 'sortResults');
+        $controller->register_hook('SEARCH_RESULT_PAGELOOKUP', 'AFTER', $this, 'resultHeading');
     }
 
     /**
@@ -108,4 +110,49 @@ class action_plugin_searchns extends ActionPlugin
             ->id('qsearchns__ns')
             ->val($ns);
     }
+
+    /**
+     * Sort and group results based on configured namespaces.
+     *
+     * @param Event $event
+     * @return void
+     */
+    public function sortResults(Event $event)
+    {
+        global $INPUT;
+        global $QUERY;
+
+        if ($INPUT->str('ns') || strpos($QUERY, '@') !== false) return;
+
+        $event->stopPropagation();
+
+        /** @var \helper_plugin_searchns $helper */
+        $helper = plugin_load('helper', 'searchns');
+
+        $event->result = $helper->sortAndGroup($event->result);
+    }
+
+    /**
+     * Format namespace headings (pseudo results)
+     *
+     * @param Event $event
+     * @return void
+     */
+    public function resultHeading(Event $event)
+    {
+        global $INPUT;
+        global $QUERY;
+
+        if ($INPUT->str('ns') || strpos($QUERY, '@') !== false) return;
+
+        /** @var \helper_plugin_searchns $helper */
+        $helper = plugin_load('helper', 'searchns');
+
+        $labels = array_keys($helper->getNsFromConfig() + [$this->getLang('other label') => '']);
+
+        if (in_array($event->data['page'], $labels)) {
+            $event->data['listItemContent'][0] = '<div class="searchns_heading">' . $event->data['page'] . '</div>';
+        }
+    }
+
 }

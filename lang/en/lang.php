@@ -6,4 +6,5 @@
  */
 
  $lang['namespace label'] = 'Filter';
-
+ $lang['all label'] = 'all';
+ $lang['other label'] = 'Other';
