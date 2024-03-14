@@ -119,28 +119,42 @@ class helper_plugin_searchns extends Plugin
      */
     public function sortAndGroup($results)
     {
-        $res = [];
+        $namespaces = array_filter($this->getNsFromConfig());
+        $original = $namespaces;
 
-        $namespaces = $this->getNsFromConfig();
+        // make sure more specific namespaces are sorted first
+        uasort($namespaces, 'ft_pagesorter');
+        $namespaces = array_reverse($namespaces);
+
+        $res = [];
         foreach ($namespaces as $label => $ns) {
             $res[$ns] = array_filter($results, function ($page) use ($ns) {
                 return strpos($page, $ns . ':') === 0;
             }, ARRAY_FILTER_USE_KEY);
-            // prepend namespace label
+
             if (!empty($res[$ns])) {
+                // prepend namespace label
                 $res[$ns] = array_merge([$label => ''], $res[$ns]);
+                // remove matches from result set
+                $results = array_diff_key($results, $res[$ns]);
             }
-            $res = array_merge($res, $res[$ns]);
-            unset($res[$ns]);
+        }
+
+        // reorder namespace as in the original configuration
+        $all = [];
+        foreach ($original as $ns) {
+            if (!empty($res[$ns])) {
+                $all = array_merge($all, $res[$ns]);
+            }
         }
 
         // add the remainder as "other"
-        $rest = array_diff_key($results, $res);
+        $rest = array_diff_key($results, $all);
         if (!empty($rest)) {
-            $res[$this->getLang('other label')] = '';
-            $res = array_merge($res, $rest);
+            $all[$this->getLang('other label')] = '';
+            $all = array_merge($all, $rest);
         }
 
-        return $res;
+        return $all;
     }
 }
