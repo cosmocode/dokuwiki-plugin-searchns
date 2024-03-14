@@ -10,6 +10,8 @@ use dokuwiki\Extension\Plugin;
  */
 class helper_plugin_searchns extends Plugin
 {
+    public const SEARCHNS_HEADING = 'SEARCHNS_HEADING';
+
     /**
      * @var array
      */
@@ -97,7 +99,9 @@ class helper_plugin_searchns extends Plugin
             } else {
                 $name = $id;
             }
-            $ret .= '<li>' . html_wikilink(':' . $id, $name) . '</li>';
+            $ret .= '<li>';
+            $ret .= $title === self::SEARCHNS_HEADING ? $id : html_wikilink(':' . $id, $name);
+            $ret .= '</li>';
 
             $counter++;
             if ($counter > $maxnumbersuggestions) {
@@ -134,7 +138,7 @@ class helper_plugin_searchns extends Plugin
 
             if (!empty($res[$ns])) {
                 // prepend namespace label
-                $res[$ns] = array_merge([$label => ''], $res[$ns]);
+                $res[$ns] = array_merge([$label => self::SEARCHNS_HEADING], $res[$ns]);
                 // remove matches from result set
                 $results = array_diff_key($results, $res[$ns]);
             }
@@ -151,7 +155,7 @@ class helper_plugin_searchns extends Plugin
         // add the remainder as "other"
         $rest = array_diff_key($results, $all);
         if (!empty($rest)) {
-            $all[$this->getLang('other label')] = '';
+            $all[$this->getLang('other label')] = self::SEARCHNS_HEADING;
             $all = array_merge($all, $rest);
         }
 

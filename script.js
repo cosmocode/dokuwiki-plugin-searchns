@@ -10,7 +10,7 @@ jQuery(function () {
 
     // try restoring a saved namespace, or first option if stored is not present
     const toRestore = localStorage.getItem(storageName);
-    if (toRestore && $select.find('option[value="' + toRestore + '"').length > 0) {
+    if (typeof toRestore !== 'undefined' && $select.find('option[value="' + toRestore + '"').length > 0) {
         $select.val(toRestore);
     } else {
         $select[0].selectedIndex = 0;
