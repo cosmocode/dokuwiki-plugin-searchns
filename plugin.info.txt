@@ -1,7 +1,7 @@
 base   searchns
 author Anna Dabrowska
 email  dokuwiki@cosmocode.de
-date   2024-03-06
+date   2024-03-14
 name   searchns plugin
 desc   Namspace options for quick search
 url    https://www.dokuwiki.org/plugin:searchns
