@@ -101,9 +101,14 @@ class action_plugin_searchns extends ActionPlugin
             $form->findPositionByAttribute('name', 'q')
         );
 
+        $namespaces = $helper->getNsFromConfig();
+        if($this->getConf('filter by acl')) {
+            $namespaces = array_filter($namespaces, [$helper, 'filterByACL']);
+        }
+
         // prepend namespace dropdown
         $form->addDropdown('ns',
-            array_flip($helper->getNsFromConfig()),
+            array_flip($namespaces),
             $this->getLang('namespace label'),
             0
             )

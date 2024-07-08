@@ -7,3 +7,4 @@
 
 $conf['namespaces'] = '';
 $conf['first all'] = 0;
+$conf['filter by acl'] = 0;

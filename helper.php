@@ -61,6 +61,18 @@ class helper_plugin_searchns extends Plugin
     }
 
     /**
+     * array_filter callback to remove namespaces that the current user can't read
+     *
+     * @param string $ns
+     * @return bool
+     */
+    public function filterByACL($ns)
+    {
+        if ($ns === '') return true; // all is always allowed
+        return auth_quickaclcheck($ns . ':*') >= AUTH_READ;
+    }
+
+    /**
      * Returns HTML list of search results.
      * Based on core quicksearch
      * @see \dokuwiki\Ajax::callQsearch()

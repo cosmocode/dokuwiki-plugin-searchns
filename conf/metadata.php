@@ -7,3 +7,4 @@
 
 $meta['namespaces'] = [''];
 $meta['first all'] = ['onoff'];
+$meta['filter by acl'] = ['onoff'];
