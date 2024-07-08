@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\Form\Form;
 use dokuwiki\Extension\ActionPlugin;
 use dokuwiki\Extension\EventHandler;
 use dokuwiki\Extension\Event;
@@ -69,7 +70,7 @@ class action_plugin_searchns extends ActionPlugin
         global $INPUT;
         global $lang;
 
-        /** @var \dokuwiki\Form\Form $form */
+        /** @var Form $form */
         $form = $event->data;
 
         /** @var \helper_plugin_searchns $helper */
@@ -102,16 +103,17 @@ class action_plugin_searchns extends ActionPlugin
         );
 
         $namespaces = $helper->getNsFromConfig();
-        if($this->getConf('filter by acl')) {
+        if ($this->getConf('filter by acl')) {
             $namespaces = array_filter($namespaces, [$helper, 'filterByACL']);
         }
 
         // prepend namespace dropdown
-        $form->addDropdown('ns',
+        $form->addDropdown(
+            'ns',
             array_flip($namespaces),
             $this->getLang('namespace label'),
             0
-            )
+        )
             ->id('qsearchns__ns')
             ->val($ns);
     }
@@ -159,5 +161,4 @@ class action_plugin_searchns extends ActionPlugin
             $event->data['listItemContent'][0] = '<div class="searchns_heading">' . $event->data['page'] . '</div>';
         }
     }
-
 }

@@ -144,9 +144,11 @@ class helper_plugin_searchns extends Plugin
 
         $res = [];
         foreach ($namespaces as $label => $ns) {
-            $res[$ns] = array_filter($results, function ($page) use ($ns) {
-                return strpos($page, $ns . ':') === 0;
-            }, ARRAY_FILTER_USE_KEY);
+            $res[$ns] = array_filter(
+                $results,
+                static fn($page) => strpos($page, $ns . ':') === 0,
+                ARRAY_FILTER_USE_KEY
+            );
 
             if (!empty($res[$ns])) {
                 // prepend namespace label
@@ -166,7 +168,7 @@ class helper_plugin_searchns extends Plugin
 
         // add the remainder as "other"
         $rest = array_diff_key($results, $all);
-        if (!empty($rest)) {
+        if ($rest !== []) {
             $all[$this->getLang('other label')] = self::SEARCHNS_HEADING;
             $all = array_merge($all, $rest);
         }
